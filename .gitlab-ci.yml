@@ -1,0 +1,32 @@
+stages:
+  - build
+  - docker
+  - test
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+  after_script:
+    - echo "End build"
+
+docker:
+  stage: docker
+  script:
+    - docker rmi -f frontend
+    - docker build -t frontend .
+    - docker run -d -p 8080:8080 frontend
+  after_script:
+  - echo "End docker"
+
+test:
+  stage: test
+  allow_failure: true
+  script:
+  - sleep 60
+  - npm install
+  - npm run cypress:verify
+  - npm run cypress:run
+  after_script:
+  - echo "End test"
